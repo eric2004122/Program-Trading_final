@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>0050 MACD 策略結果</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- ↓↓↓ 新增的 CSS 樣式 ↓↓↓ -->
+  <style>
+    .background-gradient {
+      background: linear-gradient(135deg, #1e3a8a, #4c1d95, #be185d);
+      background-size: 200% 200%;
+      animation: gradient-animation 15s ease infinite;
+    }
+    @keyframes gradient-animation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+  </style>
+</head>
+<body class="background-gradient text-white font-sans antialiased">
+  <header class="bg-black/20 backdrop-blur-lg border-b border-white/20 shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <i class="fas fa-chart-line text-3xl text-white"></i>
+        <h1 class="text-2xl font-bold text-white">策略回測結果分析</h1>
+      </div>
+      <a href="/" class="text-sm font-medium text-slate-200 hover:text-white transition-colors">
+        <i class="fas fa-arrow-left mr-1"></i>
+        返回重設參數
+      </a>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-6 py-8">
+    {% if error %}
+    <div class="glass-card bg-red-500/30 border-red-500/50 p-4 mb-8" role="alert">
+      <div class="flex items-center">
+        <i class="fas fa-exclamation-triangle text-2xl mr-4 text-white"></i>
+        <div>
+          <p class="font-bold text-white">錯誤</p>
+          <p class="text-red-200">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Key Metrics Dashboard -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="bg-blue-500/20 p-4 rounded-full">
+          <i class="fas fa-calendar-alt text-2xl text-blue-300"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-slate-300">回測結束日期</h3>
+          <p class="text-2xl font-bold text-white">{{ today }}</p>
+        </div>
+      </div>
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="bg-yellow-500/20 p-4 rounded-full">
+          <i class="fas fa-lightbulb text-2xl text-yellow-300"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-slate-300">最後訊號 / 狀態</h3>
+          <p class="text-xl font-bold text-white">{{ signal }}</p>
+        </div>
+      </div>
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="{{ 'bg-green-500/20' if total_return_float >= 0 else 'bg-red-500/20' }} p-4 rounded-full">
+          <i class="fas fa-percentage text-2xl {{ 'text-green-300' if total_return_float >= 0 else 'text-red-300' }}"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-slate-300">總報酬率</h3>
+          <p class="text-2xl font-bold {{ 'text-green-300' if total_return_float >= 0 else 'text-red-300' }}">{{ total_return }}%</p>
+        </div>
+      </div>
+    </div>
+
+    {% if macd_chart_b64 %}
+    <div class="glass-card p-6 mb-8">
+      <h2 class="text-2xl font-bold mb-4 text-white">MACD 策略圖表</h2>
+      <div class="overflow-hidden rounded-lg">
+          <img src="{{ macd_chart_b64 }}" alt="MACD 圖" class="w-full">
+      </div>
+    </div>
+    {% endif %}
+
+    {% if trades %}
+    <div class="glass-card p-6">
+      <h2 class="text-2xl font-bold mb-4 text-white">詳細交易紀錄</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm text-left">
+          <thead class="text-xs text-slate-300 uppercase">
+            <tr>
+              <th scope="col" class="px-6 py-3">日期</th>
+              <th scope="col" class="px-6 py-3">動作</th>
+              <th scope="col" class="px-6 py-3 text-right">價格</th>
+              <th scope="col" class="px-6 py-3 text-right">股數</th>
+              <th scope="col" class="px-6 py-3 text-right">資金餘額</th>
+              <th scope="col" class="px-6 py-3 text-right">單筆報酬率</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in trades %}
+            <tr class="border-b border-white/20 hover:bg-white/10">
+              <td class="px-6 py-4 font-medium text-white whitespace-nowrap">{{ t['日期'] }}</td>
+              <td class="px-6 py-4">
+                {% if '買進' in t['動作'] %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-300">
+                  <i class="fas fa-arrow-up mr-1.5"></i> {{ t['動作'] }}
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/20 text-red-300">
+                  <i class="fas fa-arrow-down mr-1.5"></i> {{ t['動作'] }}
+                </span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-right text-slate-200">{{ t['價格'] }}</td>
+              <td class="px-6 py-4 text-right text-slate-200">{{ t['股數'] }}</td>
+              <td class="px-6 py-4 text-right text-slate-200">{{ t['資金餘額'] }}</td>
+              <td class="px-6 py-4 text-right font-medium {{ 'text-green-300' if (t.get('報酬率', '0%')|replace('%', '')|float) >= 0 else 'text-red-300' }}">{{ t.get('報酬率', '—') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% elif not error %}
+    <div class="text-center py-12 glass-card">
+        <i class="fas fa-box-open text-6xl text-slate-400"></i>
+        <p class="mt-4 text-lg text-slate-300">在此期間內沒有符合條件的交易紀錄。</p>
+    </div>
+    {% endif %}
+  </main>
+
+  <footer class="bg-black/20 backdrop-blur-lg border-t border-white/20 text-white py-4 text-center mt-12">
+    <p>© 2025 0050 MACD 策略平台。僅供模擬與學術研究用途。</p>
+  </footer>
+</body>
+</html>
