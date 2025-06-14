@@ -8,7 +8,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-  <!-- ↓↓↓ 新增的 CSS 樣式 ↓↓↓ -->
   <style>
     .background-gradient {
       background: linear-gradient(135deg, #1e3a8a, #4c1d95, #be185d);
@@ -57,26 +56,9 @@
     </div>
     {% endif %}
 
-    <!-- Key Metrics Dashboard -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="glass-card p-6 flex items-center space-x-4">
-        <div class="bg-blue-500/20 p-4 rounded-full">
-          <i class="fas fa-calendar-alt text-2xl text-blue-300"></i>
-        </div>
-        <div>
-          <h3 class="text-sm font-medium text-slate-300">回測結束日期</h3>
-          <p class="text-2xl font-bold text-white">{{ today }}</p>
-        </div>
-      </div>
-      <div class="glass-card p-6 flex items-center space-x-4">
-        <div class="bg-yellow-500/20 p-4 rounded-full">
-          <i class="fas fa-lightbulb text-2xl text-yellow-300"></i>
-        </div>
-        <div>
-          <h3 class="text-sm font-medium text-slate-300">最後訊號 / 狀態</h3>
-          <p class="text-xl font-bold text-white">{{ signal }}</p>
-        </div>
-      </div>
+    <!-- Key Metrics Dashboard - Updated to 4 columns -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- 總報酬率 -->
       <div class="glass-card p-6 flex items-center space-x-4">
         <div class="{{ 'bg-green-500/20' if total_return_float >= 0 else 'bg-red-500/20' }} p-4 rounded-full">
           <i class="fas fa-percentage text-2xl {{ 'text-green-300' if total_return_float >= 0 else 'text-red-300' }}"></i>
@@ -84,6 +66,66 @@
         <div>
           <h3 class="text-sm font-medium text-slate-300">總報酬率</h3>
           <p class="text-2xl font-bold {{ 'text-green-300' if total_return_float >= 0 else 'text-red-300' }}">{{ total_return }}%</p>
+        </div>
+      </div>
+      <!-- 年化報酬率 -->
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="{{ 'bg-green-500/20' if annualized_return|float >= 0 else 'bg-red-500/20' }} p-4 rounded-full">
+            <i class="fas fa-chart-area text-2xl {{ 'text-green-300' if annualized_return|float >= 0 else 'text-red-300' }}"></i>
+        </div>
+        <div>
+            <h3 class="text-sm font-medium text-slate-300">年化報酬率 (CAGR)</h3>
+            <p class="text-2xl font-bold {{ 'text-green-300' if annualized_return|float >= 0 else 'text-red-300' }}">{{ annualized_return }}%</p>
+        </div>
+      </div>
+      <!-- 勝率 -->
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="bg-yellow-500/20 p-4 rounded-full">
+          <i class="fas fa-trophy text-2xl text-yellow-300"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-slate-300">勝率</h3>
+          <p class="text-2xl font-bold text-white">{{ win_rate }}%</p>
+        </div>
+      </div>
+      <!-- 最大回撤 (風險) -->
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="bg-red-500/20 p-4 rounded-full">
+            <i class="fas fa-arrow-trend-down text-2xl text-red-300"></i>
+        </div>
+        <div>
+            <h3 class="text-sm font-medium text-slate-300">最大回撤 (風險)</h3>
+            <p class="text-2xl font-bold text-red-300">{{ max_drawdown }}%</p>
+        </div>
+      </div>
+      <!-- 交易次數 -->
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="bg-purple-500/20 p-4 rounded-full">
+            <i class="fas fa-exchange-alt text-2xl text-purple-300"></i>
+        </div>
+        <div>
+            <h3 class="text-sm font-medium text-slate-300">交易次數</h3>
+            <p class="text-2xl font-bold text-white">{{ total_trades }}</p>
+        </div>
+      </div>
+      <!-- 最後訊號 -->
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="bg-blue-500/20 p-4 rounded-full">
+            <i class="fas fa-lightbulb text-2xl text-blue-300"></i>
+        </div>
+        <div>
+            <h3 class="text-sm font-medium text-slate-300">最後訊號 / 狀態</h3>
+            <p class="text-xl font-bold text-white">{{ signal }}</p>
+        </div>
+      </div>
+       <!-- 回測結束日期 -->
+      <div class="glass-card p-6 flex items-center space-x-4">
+        <div class="bg-gray-500/20 p-4 rounded-full">
+          <i class="fas fa-calendar-alt text-2xl text-gray-300"></i>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-slate-300">回測結束日期</h3>
+         <p class="text-2xl font-bold text-white">{{ end_date }}</p>
         </div>
       </div>
     </div>
@@ -140,7 +182,7 @@
     {% elif not error %}
     <div class="text-center py-12 glass-card">
         <i class="fas fa-box-open text-6xl text-slate-400"></i>
-        <p class="mt-4 text-lg text-slate-300">在此期間內沒有符合條件的交易紀錄。</p>
+        <p class="mt-4 text-lg text-slate-300">在此期間内沒有符合條件的交易紀錄。</p>
     </div>
     {% endif %}
   </main>
