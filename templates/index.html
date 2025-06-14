@@ -8,43 +8,50 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   
-  <!-- ↓↓↓ 新增的 CSS 樣式 ↓↓↓ -->
   <style>
+    /* 全新色彩主題: "靜謐深藍與青金石" */
     .background-gradient {
-      background: linear-gradient(135deg, #1e3a8a, #4c1d95, #be185d);
+      /* 由深邃的海軍藍到沉靜的暗灰藍 */
+      background: linear-gradient(135deg, #0d1a3c, #1f2937, #111827);
       background-size: 200% 200%;
-      animation: gradient-animation 15s ease infinite;
+      animation: gradient-animation 18s ease infinite;
     }
     @keyframes gradient-animation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-    /* 自訂玻璃效果的通用類別 */
     .glass-card {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px); /* Safari 支援 */
+      /* 更精緻的玻璃效果，帶有藍色調的背景 */
+      background: rgba(17, 24, 39, 0.6);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-radius: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      /* 邊框使用新的核心強調色 */
+      border: 1px solid rgba(34, 211, 238, 0.2);
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     }
     .glass-input {
-        background: rgba(255, 255, 255, 0.15) !important;
-        border: 1px solid rgba(255, 255, 255, 0.3) !important;
-        color: white !important;
+        background: rgba(31, 41, 55, 0.5) !important;
+        border: 1px solid rgba(55, 65, 81, 0.8) !important;
+        color: #e5e7eb !important; /* light gray */
     }
     .glass-input::placeholder {
-        color: rgba(255, 255, 255, 0.5);
+        color: #9ca3af; /* medium gray */
+    }
+    /* 焦點顏色統一為核心的青色 */
+    .glass-input:focus {
+        --tw-ring-color: rgba(34, 211, 238, 0.5) !important;
+        border-color: rgba(34, 211, 238, 0.8) !important;
     }
   </style>
 </head>
-<body class="background-gradient text-white font-sans antialiased">
+<body class="background-gradient text-gray-200 font-sans antialiased">
   <div class="min-h-screen flex flex-col">
-    <header class="bg-black/20 backdrop-blur-lg border-b border-white/20 shadow-lg sticky top-0 z-50">
+    <header class="bg-black/25 backdrop-blur-lg border-b border-gray-200/10 shadow-lg sticky top-0 z-50">
       <div class="container mx-auto px-6 py-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-          <i class="fas fa-chart-line text-3xl text-white"></i>
+          <i class="fas fa-chart-line text-3xl text-cyan-300"></i>
           <h1 class="text-2xl font-bold text-white">0050 MACD 策略分析平台</h1>
         </div>
       </div>
@@ -53,41 +60,46 @@
     <main class="container mx-auto px-6 py-12 flex-grow flex items-center justify-center">
       <div class="w-full max-w-lg mx-auto glass-card p-8">
         <h2 class="text-3xl font-bold mb-2 text-center text-white">設定回測參數</h2>
-        <p class="text-slate-300 text-center mb-8">輸入您的回測條件，開始進行策略模擬。</p>
+        <p class="text-gray-400 text-center mb-8">輸入您的回測條件，開始進行策略模擬。</p>
         
         <form method="GET" action="/strategy" class="space-y-6">
           <div>
-            <label for="cash" class="block text-sm font-medium text-slate-200">投入金額 (TWD)</label>
+            <label for="cash" class="block text-sm font-medium text-gray-300">投入金額 (TWD)</label>
             <div class="mt-1 relative rounded-md">
               <div class="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-                <span class="text-slate-400 sm:text-sm">$</span>
+                <span class="text-gray-500 sm:text-sm">$</span>
               </div>
-              <input type="number" name="cash" id="cash" value="1000000" required class="w-full pl-7 pr-4 py-2 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition glass-input" />
+              <input type="number" name="cash" id="cash" value="1000000" required class="w-full pl-7 pr-4 py-2 rounded-md transition glass-input" />
             </div>
           </div>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label for="start" class="block text-sm font-medium text-slate-200">開始日期</label>
-              <input type="date" name="start" id="start" required class="w-full px-4 py-2 rounded-md mt-1 focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition glass-input" />
+              <label for="start" class="block text-sm font-medium text-gray-300">開始日期</label>
+              <input type="date" name="start" id="start" required class="w-full px-4 py-2 rounded-md mt-1 transition glass-input" />
             </div>
             <div>
-              <label for="end" class="block text-sm font-medium text-slate-200">結束日期</label>
-              <input type="date" name="end" id="end" required class="w-full px-4 py-2 rounded-md mt-1 focus:ring-2 focus:ring-pink-400 focus:border-pink-400 transition glass-input" />
+              <label for="end" class="block text-sm font-medium text-gray-300">結束日期</label>
+              <input type="date" name="end" id="end" required class="w-full px-4 py-2 rounded-md mt-1 transition glass-input" />
             </div>
           </div>
           
           <div class="text-center pt-4">
-            <button type="submit" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transform transition-all duration-300">
+            <button type="submit" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold px-8 py-3 rounded-lg shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transform transition-all duration-300 disabled:opacity-75 disabled:scale-100 disabled:shadow-none">
               <i class="fas fa-rocket mr-2"></i> 開始回測
             </button>
           </div>
         </form>
       </div>
     </main>
+    
+    <div id="loading-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex-col items-center justify-center z-[999] hidden">
+      <div class="w-16 h-16 border-4 border-t-transparent border-cyan-400 rounded-full animate-spin"></div>
+      <p class="mt-4 text-white text-lg font-semibold">策略回測中，請稍候...</p>
+    </div>
 
-    <footer class="bg-black/20 backdrop-blur-lg border-t border-white/20 text-white py-4 text-center mt-auto">
-      <p>© 2025 0050 MACD 策略平台。僅供模擬與學術研究用途。</p>
+    <footer class="bg-black/25 backdrop-blur-lg border-t border-gray-200/10 text-gray-400 py-4 text-center mt-auto">
+      <p class="text-sm">© 2025 0050 MACD 策略平台。僅供模擬與學術研究用途。</p>
     </footer>
   </div>
 
@@ -100,6 +112,20 @@
       const threeYearsAgo = new Date();
       threeYearsAgo.setFullYear(today.getFullYear() - 3);
       startDateInput.value = threeYearsAgo.toISOString().split('T')[0];
+      
+      const form = document.querySelector('form');
+      const loadingOverlay = document.getElementById('loading-overlay');
+      const submitButton = form.querySelector('button[type="submit"]');
+
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity()) {
+            loadingOverlay.classList.remove('hidden');
+            loadingOverlay.classList.add('flex');
+            
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> 計算中...';
+        }
+      });
     });
   </script>
 </body>
